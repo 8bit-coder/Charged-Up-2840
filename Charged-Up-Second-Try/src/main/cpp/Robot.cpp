@@ -30,10 +30,10 @@ class Robot : public frc::TimedRobot {
   void TeleopInit() override {}
 
   void TeleopPeriodic() override {
-    double leftMotorSpeed = -m_controller.GetRawAxis(0);
-    double rightMotorSpeed = m_controller.GetRawAxis(1);
-    m_robotDriveFront.ArcadeDrive(leftMotorSpeed, rightMotorSpeed);
-    m_robotDriveRear.ArcadeDrive(leftMotorSpeed, rightMotorSpeed);
+    double speed = -m_controller.GetRawAxis(1);
+    double turn = -m_controller.GetRawAxis(0);
+    m_robotDriveFront.ArcadeDrive(speed, turn);
+    m_robotDriveRear.ArcadeDrive(speed, turn);
   }
 
   void TestInit() override {}
