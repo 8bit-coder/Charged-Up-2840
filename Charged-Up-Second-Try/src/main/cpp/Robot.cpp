@@ -8,6 +8,16 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/PWMTalonSRX.h>
 
+frc::PWMTalonSRX m_left{0};
+frc::PWMTalonSRX m_right{1};
+frc::PWMTalonSRX m_left2{2};
+frc::PWMTalonSRX m_right2{3};
+frc::DifferentialDrive m_robotDriveFront{m_left, m_right};
+frc::DifferentialDrive m_robotDriveRear{m_left2, m_right2};
+
+frc::XboxController m_controller{0};
+frc::Timer m_timer;
+
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
@@ -39,18 +49,6 @@ class Robot : public frc::TimedRobot {
   void TestInit() override {}
 
   void TestPeriodic() override {}
-
- private:
-  // Robot drive system
-  frc::PWMTalonSRX m_left{0};
-  frc::PWMTalonSRX m_right{1};
-  frc::PWMTalonSRX m_left2{2};
-  frc::PWMTalonSRX m_right2{3};
-  frc::DifferentialDrive m_robotDriveFront{m_left, m_right};
-  frc::DifferentialDrive m_robotDriveRear{m_left2, m_right2};
-
-  frc::XboxController m_controller{0};
-  frc::Timer m_timer;
 };
 
 #ifndef RUNNING_FRC_TESTS
