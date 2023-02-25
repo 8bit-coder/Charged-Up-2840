@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #include <frc/TimedRobot.h>
 #include <frc/Timer.h>
 #include <frc/XboxController.h>
@@ -21,9 +17,6 @@ frc::Timer m_timer;
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
     m_right.SetInverted(true);
     m_right2.SetInverted(true);
     m_robotDriveFront.SetExpiration(100_ms);
