@@ -54,10 +54,6 @@ void loop() {
   SUM = SUM + VALUE;                 // Add the newest reading to the sum
   INDEX = (INDEX+1) % WINDOW_SIZE;   // Increment the index, and wrap to 0 if it exceeds the window size
   AVERAGED = SUM / WINDOW_SIZE;      // Divide the sum of the window by the window size for the result
-  Serial.print("-100");
-  Serial.print("\t");
-  Serial.print(map(AVERAGED,-100,100,-90,90));
-  Serial.print("\t");
-  Serial.println("100");
+  Serial.println(map(AVERAGED,-100,100,-90,90));
   delay(10);
 }
