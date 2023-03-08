@@ -17,7 +17,7 @@ calData calib = { 0 };  //Calibration data
 AccelData accelData;    //Sensor data
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial) {
     ;
   }
@@ -54,10 +54,10 @@ void loop() {
   SUM = SUM + VALUE;                 // Add the newest reading to the sum
   INDEX = (INDEX+1) % WINDOW_SIZE;   // Increment the index, and wrap to 0 if it exceeds the window size
   AVERAGED = SUM / WINDOW_SIZE;      // Divide the sum of the window by the window size for the result
-  Serial.print("-100");
-  Serial.print("\t");
-  Serial.print(map(AVERAGED,-100,100,-90,90));
-  Serial.print("\t");
+  //Serial.print("-100");
+  //Serial.print("\t");
+  //Serial.print(map(AVERAGED,-100,100,-90,90));
+  //Serial.print("\t");
   Serial.println("100");
-  delay(10);
+  delay(1000);
 }
