@@ -8,12 +8,29 @@
 #include <ctre/Phoenix.h>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
+#include <list>
+
 //yike
-ctre::phoenix::motorcontrol::can::TalonFX testMotor(0);
+ctre::phoenix::motorcontrol::can::TalonFX joint1Motor(0);
+ctre::phoenix::motorcontrol::can::TalonFX joint2Motor(1);
 
-auto sensorCollectionMotor1 = testMotor.GetSensorCollection();
+auto sensorCollectionMotor1 = joint1Motor.GetSensorCollection();
+auto sensorCollectionMotor1 = joint2Motor.GetSensorCollection();
 
-double position = sensorCollectionMotor1.GetIntegratedSensorAbsolutePosition();
+double currJoint1Pos = sensorCollectionMotor1.GetIntegratedSensorAbsolutePosition();
+double currJoint2Pos = sensorCollectionMotor1.GetIntegratedSensorAbsolutePosition();
+
+double endPoint[2]; //distance from origin
+double origin[2]; //always 0
+
+
+double a1; //length of first arm segment
+double a2; //length of second arm segment
+
+
+double q1;
+double q2;
 
 frc::PWMTalonSRX m_left{0};
 frc::PWMTalonSRX m_right{1};
@@ -41,11 +58,50 @@ class Robot : public frc::TimedRobot {
     m_timer.Start();
   }
 
-  void RobotInit() override {
+   void RobotInit() override {
     // Instantiate the DIO objects for port 0 and port 1
     lms_grabberInward = new frc::DigitalInput(0);
     lms_grabberOutward = new frc::DigitalInput(1);
+
+
+    a1 = 10;
+    a2 = 10;
+
+
+    origin[0] = 0;
+    origin[1] = 0;
   }
+  void RobotPeriodic() override
+  {
+    currJoint1Pos = map(currJoint1Pos, 0, 2048, 0, 360);
+    currJoint2Pos = map(currJoint2Pos, 0, 2047, 0, 359);
+
+
+    endPoint[0] = 1;
+    endPoint[1] = 1;
+
+
+    double sqrDist = pow(endPoint[0],2) + pow(endPoint[1],2);
+
+
+    if(sqrt(sqrDist) > a1 + a2)
+    {
+      endPoint[0] = endPoint[0] * ((a1 + a2) / sqrt(sqrDist));
+      endPoint[1] = endPoint[1] * ((a1 + a2) / sqrt(sqrDist));
+    }
+
+
+    q2 = acos(((endPoint[0] - origin[0])*(endPoint[0] - origin[0]) + (endPoint[1] - origin[1])*(endPoint[1] - origin[1]) + (-a1*a1) + (-a2*a2))/(2*a1*a2));
+    q1 = atan2((endPoint[1] - origin[1]),(endPoint[0] - origin[0])) - atan2((a2*sin(q2)),(a1 + a2*cos(q2))) ;
+ 
+    int targetEncoderValue1 = static_cast<int>(std::round(map(q1, 0, 360, 0, 2048)));
+    int targetEncoderValue2 = static_cast<int>(std::round(map(q2, 0, 360, 0, 2048)));
+
+
+    joint2Motor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, targetEncoderValue1);
+    joint2Motor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, targetEncoderValue2);
+  }
+
 
   void AutonomousInit() override {
   }
@@ -77,6 +133,13 @@ class Robot : public frc::TimedRobot {
   void TestInit() override {}
 
   void TestPeriodic() override {}
+
+  double map(double value, double start1, double stop1, double start2, double stop2)
+ {
+    return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+  }
+};
+
 };
 
 #ifndef RUNNING_FRC_TESTS
