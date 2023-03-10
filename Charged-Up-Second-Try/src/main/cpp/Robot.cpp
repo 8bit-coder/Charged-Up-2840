@@ -66,9 +66,9 @@ class Robot : public frc::TimedRobot {
     bool lms_inward_state = lms_inward->Get();
     bool lms_outward_state = lms_outward->Get();
     if(m_controller.GetRawButton(5) && lms_inward_state == false){
-      m_grabber.Set(0.2);
+      m_grabber.Set(0.1);
     }else if(m_controller.GetRawButton(6) && lms_outward_state == false){
-      m_grabber.Set(-0.2);
+      m_grabber.Set(-0.1);
     }else{
       m_grabber.Set(0);
     }
