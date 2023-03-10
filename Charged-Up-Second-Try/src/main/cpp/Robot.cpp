@@ -30,8 +30,8 @@ frc::Timer m_timer;
 
 class Robot : public frc::TimedRobot {
  public:
- frc::DigitalInput* lms_inward;
- frc::DigitalInput* lms_outward;
+ frc::DigitalInput* lms_grabberInward;
+ frc::DigitalInput* lms_grabberOutward;
 
   Robot() {
     m_right.SetInverted(true);
@@ -43,8 +43,8 @@ class Robot : public frc::TimedRobot {
 
   void RobotInit() override {
     // Instantiate the DIO objects for port 0 and port 1
-    lms_inward = new frc::DigitalInput(0);
-    lms_outward = new frc::DigitalInput(1);
+    lms_grabberInward = new frc::DigitalInput(0);
+    lms_grabberOutward = new frc::DigitalInput(1);
   }
 
   void AutonomousInit() override {
@@ -63,11 +63,11 @@ class Robot : public frc::TimedRobot {
     m_robotDriveFront.ArcadeDrive(speed, turn);
     m_robotDriveRear.ArcadeDrive(speed, turn);
 
-    bool lms_inward_state = lms_inward->Get();
-    bool lms_outward_state = lms_outward->Get();
-    if(m_controller.GetRawButton(5) && lms_inward_state == false){
+    bool lms_gInward_state = lms_grabberInward->Get();
+    bool lms_gOutward_state = lms_grabberInward->Get();
+    if(m_controller.GetRawButton(5) && lms_gInward_state == false){
       m_grabber.Set(0.1);
-    }else if(m_controller.GetRawButton(6) && lms_outward_state == false){
+    }else if(m_controller.GetRawButton(6) && lms_gOutward_state == false){
       m_grabber.Set(-0.1);
     }else{
       m_grabber.Set(0);
