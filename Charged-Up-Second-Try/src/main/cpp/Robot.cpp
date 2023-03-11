@@ -9,21 +9,19 @@
 #include <stdio.h>
 #include <iostream>
 //yike
-ctre::phoenix::motorcontrol::can::TalonFX testMotor(0);
-
-auto sensorCollectionMotor1 = testMotor.GetSensorCollection();
-
-double position = sensorCollectionMotor1.GetIntegratedSensorAbsolutePosition();
 
 frc::PWMTalonSRX m_left{0};
 frc::PWMTalonSRX m_right{1};
 frc::PWMTalonSRX m_left2{2};
 frc::PWMTalonSRX m_right2{3};
-frc::PWMTalonSRX m_grabber{4};
+
+ctre::phoenix::motorcontrol::can::TalonFX m_armMotor1(0);
+frc::PWMTalonSRX m_armMotor2{4};
+
+frc::PWMTalonSRX m_grabber{5};
+
 frc::DifferentialDrive m_robotDriveFront{m_left, m_right};
 frc::DifferentialDrive m_robotDriveRear{m_left2, m_right2};
-
-frc::SerialPort arduinoSerial {9600, frc::SerialPort::Port::kMXP, 8, frc::SerialPort::Parity::kParity_None, frc::SerialPort::StopBits::kStopBits_One};
 
 frc::XboxController m_controller{0};
 frc::Timer m_timer;
@@ -72,8 +70,7 @@ class Robot : public frc::TimedRobot {
     }else{
       m_grabber.Set(0);
     }
-  }
-
+  }  
   void TestInit() override {}
 
   void TestPeriodic() override {}
