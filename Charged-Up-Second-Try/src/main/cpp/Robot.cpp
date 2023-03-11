@@ -16,42 +16,45 @@
 #include <frc/motorcontrol/PWMTalonSRX.h>
 #include <frc/SerialPort.h>
 #include <ctre/Phoenix.h>
+#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <stdio.h>
 #include <iostream>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 
-frc::PWMTalonSRX m_left{0};
-frc::PWMTalonSRX m_right{1};
-frc::PWMTalonSRX m_left2{2};
-frc::PWMTalonSRX m_right2{3};
+using namespace frc;
 
-frc::MotorControllerGroup mg_drivetrainLeft{m_left, m_left2};
-frc::MotorControllerGroup mg_drivetrainRight{m_right, m_right2};
+PWMTalonSRX m_left{0};
+PWMTalonSRX m_right{1};
+PWMTalonSRX m_left2{2};
+PWMTalonSRX m_right2{3};
 
-frc::DifferentialDrive dd_robotDrive{mg_drivetrainLeft, mg_drivetrainRight};
+MotorControllerGroup mg_drivetrainLeft{m_left, m_left2};
+MotorControllerGroup mg_drivetrainRight{m_right, m_right2};
 
-frc::PWMTalonSRX m_armTiltMotor1{4};
-frc::PWMTalonSRX m_armTiltMotor2{5};
+DifferentialDrive dd_robotDrive{mg_drivetrainLeft, mg_drivetrainRight};
 
-frc::MotorControllerGroup mg_armTiltMotors{m_armTiltMotor1, m_armTiltMotor2};
+PWMTalonSRX m_armTiltMotor1{4};
+PWMTalonSRX m_armTiltMotor2{5};
 
-frc::PWMTalonSRX m_grabberTiltMotor{6};
+MotorControllerGroup mg_armTiltMotors{m_armTiltMotor1, m_armTiltMotor2};
 
-frc::PWMTalonSRX m_grabber{7};
+PWMTalonSRX m_grabberTiltMotor{6};
 
-frc::XboxController c_ps5Controller{0};
-frc::Timer t_timer;
+PWMTalonSRX m_grabber{7};
+
+XboxController c_ps5Controller{0};
+
+Timer t_timer;
 
 class Robot : public frc::TimedRobot {
  public:
-  frc::DigitalInput* lms_grabberInward = new frc::DigitalInput(0);
-  frc::DigitalInput* lms_grabberOutward = new frc::DigitalInput(1);
+  DigitalInput* lms_grabberInward = new DigitalInput(0);
+  DigitalInput* lms_grabberOutward = new DigitalInput(1);
 
-  frc::DigitalInput* lms_armTiltUpper = new frc::DigitalInput(2);
-  frc::DigitalInput* lms_armTiltLower = new frc::DigitalInput(3);
+  DigitalInput* lms_armTiltUpper = new DigitalInput(2);
+  DigitalInput* lms_armTiltLower = new DigitalInput(3);
 
-  frc::DigitalInput* lms_grabberTiltUpper = new frc::DigitalInput(4);
-  frc::DigitalInput* lms_grabberTiltLower = new frc::DigitalInput(5);
+  DigitalInput* lms_grabberTiltUpper = new DigitalInput(4);
+  DigitalInput* lms_grabberTiltLower = new DigitalInput(5);
 
   double speed = 0.0;
   double turn = 0.0;
