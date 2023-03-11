@@ -73,13 +73,27 @@ class Robot : public frc::TimedRobot {
     double turn = m_controller.GetRawAxis(0);
     m_robotDriveFront.ArcadeDrive(speed, turn);
     m_robotDriveRear.ArcadeDrive(speed, turn);
-    
+
     if(m_controller.GetRawButton(5) && lms_grabberInward->Get() == false){
       m_grabber.Set(0.1);
-    }else if(m_controller.GetRawButton(6) && lms_grabberInward->Get() == false){
+    }else if(m_controller.GetRawButton(6) && lms_grabberOutward->Get() == false){
       m_grabber.Set(-0.1);
     }else{
       m_grabber.Set(0);
+    }
+
+    if(m_controller.GetPOV() == 0 && lms_armPart1Upper->Get() == false){
+      m_armMotor1.Set(mode, 0.3);
+    }
+    if(m_controller.GetPOV() == 180 && lms_armPart1Lower->Get() == false){
+      m_armMotor1.Set(mode, -0.3);
+    }
+
+    if(m_controller.GetRawButton(4) && lms_armPart2Upper->Get() == false){
+      m_armMotor2.Set(0.3);
+    }
+    if(m_controller.GetRawButton(2) && lms_armPart2Lower->Get() == false){
+      m_armMotor2.Set(-0.3);
     }
   }  
   void TestInit() override {}
