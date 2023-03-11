@@ -14,8 +14,8 @@ frc::PWMTalonSRX m_right{1};
 frc::PWMTalonSRX m_left2{2};
 frc::PWMTalonSRX m_right2{3};
 
-ctre::phoenix::motorcontrol::can::TalonFX m_armMotor1(0);
-frc::PWMTalonSRX m_armMotor2{4};
+ctre::phoenix::motorcontrol::can::TalonFX m_armMotor(0);
+frc::PWMTalonSRX m_grabberTiltMotor{4};
 
 frc::PWMTalonSRX m_grabber{5};
 
@@ -25,18 +25,18 @@ frc::DifferentialDrive m_robotDriveRear{m_left2, m_right2};
 frc::XboxController m_controller{0};
 frc::Timer m_timer;
 
-ctre::phoenix::motorcontrol::ControlMode mode = ctre::phoenix::motorcontrol::ControlMode::PercentOutput;
-//m_armMotor1.Set(mode, 0.1); this is example code to set the speed of the motor using the CAN Falcon 500
 class Robot : public frc::TimedRobot {
  public:
- frc::DigitalInput* lms_grabberInward;
- frc::DigitalInput* lms_grabberOutward;
+  ctre::phoenix::motorcontrol::ControlMode mode = ctre::phoenix::motorcontrol::ControlMode::PercentOutput;
+ 
+ frc::DigitalInput* lms_grabberInward = new frc::DigitalInput(0);
+ frc::DigitalInput* lms_grabberOutward = new frc::DigitalInput(1);
 
- frc::DigitalInput* lms_armPart1Upper;
- frc::DigitalInput* lms_armPart1Lower;
+ frc::DigitalInput* lms_armUpper = new frc::DigitalInput(2);
+ frc::DigitalInput* lms_armLower = new frc::DigitalInput(3);
 
- frc::DigitalInput* lms_armPart2Upper;
- frc::DigitalInput* lms_armPart2Lower;
+ frc::DigitalInput* lms_grabberTiltUpper = new frc::DigitalInput(4);
+ frc::DigitalInput* lms_grabberTiltLower = new frc::DigitalInput(5);
 
   Robot() {
     m_right.SetInverted(true);
@@ -47,22 +47,12 @@ class Robot : public frc::TimedRobot {
   }
 
   void RobotInit() override {
-    // Instantiate the DIO objects for port 0 and port 1
-    lms_grabberInward = new frc::DigitalInput(0);
-    lms_grabberOutward = new frc::DigitalInput(1);
-
-    lms_armPart1Upper = new frc::DigitalInput(2);
-    lms_armPart1Lower = new frc::DigitalInput(3);
-
-    lms_armPart2Upper = new frc::DigitalInput(4);
-    lms_armPart2Lower = new frc::DigitalInput(5);
   }
 
   void AutonomousInit() override {
   }
 
   void AutonomousPeriodic() override {
-    
   }
 
   void TeleopInit() override {
@@ -82,18 +72,18 @@ class Robot : public frc::TimedRobot {
       m_grabber.Set(0);
     }
 
-    if(m_controller.GetPOV() == 0 && lms_armPart1Upper->Get() == false){
-      m_armMotor1.Set(mode, 0.3);
+    if(m_controller.GetPOV() == 0 && lms_armUpper->Get() == false){
+      m_armMotor.Set(mode, 0.3);
     }
-    if(m_controller.GetPOV() == 180 && lms_armPart1Lower->Get() == false){
-      m_armMotor1.Set(mode, -0.3);
+    if(m_controller.GetPOV() == 180 && lms_armLower->Get() == false){
+      m_armMotor.Set(mode, -0.3);
     }
 
-    if(m_controller.GetRawButton(4) && lms_armPart2Upper->Get() == false){
-      m_armMotor2.Set(0.3);
+    if(m_controller.GetRawButton(4) && lms_grabberTiltUpper->Get() == false){
+      m_grabberTiltMotor.Set(0.3);
     }
-    if(m_controller.GetRawButton(2) && lms_armPart2Lower->Get() == false){
-      m_armMotor2.Set(-0.3);
+    if(m_controller.GetRawButton(2) && lms_grabberTiltLower->Get() == false){
+      m_grabberTiltMotor.Set(-0.3);
     }
   }  
   void TestInit() override {}
