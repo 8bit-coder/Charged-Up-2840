@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <iostream>
 //yike
-
 frc::PWMTalonSRX m_left{0};
 frc::PWMTalonSRX m_right{1};
 frc::PWMTalonSRX m_left2{2};
@@ -26,10 +25,18 @@ frc::DifferentialDrive m_robotDriveRear{m_left2, m_right2};
 frc::XboxController m_controller{0};
 frc::Timer m_timer;
 
+ctre::phoenix::motorcontrol::ControlMode mode = ctre::phoenix::motorcontrol::ControlMode::PercentOutput;
+//m_armMotor1.Set(mode, 0.1); this is example code to set the speed of the motor using the CAN Falcon 500
 class Robot : public frc::TimedRobot {
  public:
  frc::DigitalInput* lms_grabberInward;
  frc::DigitalInput* lms_grabberOutward;
+
+ frc::DigitalInput* lms_armPart1Upper;
+ frc::DigitalInput* lms_armPart1Lower;
+
+ frc::DigitalInput* lms_armPart2Upper;
+ frc::DigitalInput* lms_armPart2Lower;
 
   Robot() {
     m_right.SetInverted(true);
@@ -43,6 +50,12 @@ class Robot : public frc::TimedRobot {
     // Instantiate the DIO objects for port 0 and port 1
     lms_grabberInward = new frc::DigitalInput(0);
     lms_grabberOutward = new frc::DigitalInput(1);
+
+    lms_armPart1Upper = new frc::DigitalInput(2);
+    lms_armPart1Lower = new frc::DigitalInput(3);
+
+    lms_armPart2Upper = new frc::DigitalInput(4);
+    lms_armPart2Lower = new frc::DigitalInput(5);
   }
 
   void AutonomousInit() override {
@@ -56,16 +69,14 @@ class Robot : public frc::TimedRobot {
   }
 
   void TeleopPeriodic() override {
-    double speed = m_controller.GetRawAxis(5);
-    double turn = m_controller.GetRawAxis(2);
+    double speed = m_controller.GetRawAxis(1);
+    double turn = m_controller.GetRawAxis(0);
     m_robotDriveFront.ArcadeDrive(speed, turn);
     m_robotDriveRear.ArcadeDrive(speed, turn);
-
-    bool lms_gInward_state = lms_grabberInward->Get();
-    bool lms_gOutward_state = lms_grabberInward->Get();
-    if(m_controller.GetRawButton(5) && lms_gInward_state == false){
+    
+    if(m_controller.GetRawButton(5) && lms_grabberInward->Get() == false){
       m_grabber.Set(0.1);
-    }else if(m_controller.GetRawButton(6) && lms_gOutward_state == false){
+    }else if(m_controller.GetRawButton(6) && lms_grabberInward->Get() == false){
       m_grabber.Set(-0.1);
     }else{
       m_grabber.Set(0);
