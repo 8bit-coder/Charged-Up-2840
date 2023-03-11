@@ -4,6 +4,7 @@
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/PWMTalonSRX.h>
+#include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc/SerialPort.h>
 #include <ctre/Phoenix.h>
 #include <stdio.h>
@@ -69,6 +70,8 @@ class Robot : public frc::TimedRobot {
   }
   void RobotPeriodic() override
   {
+    constexpr int kNumBytesToRead = 3; //num of digits + 2
+
     currJoint1Pos = map(currJoint1Pos, 0, 2048, 0, 360);
     currJoint2Pos = map(currJoint2Pos, 0, 2047, 0, 359);
 
@@ -91,6 +94,23 @@ class Robot : public frc::TimedRobot {
 
     joint1Motor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, targetEncoderValue1);
     joint2Motor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, targetEncoderValue2);
+
+    if(arduinoSerial.GetBytesReceived() > 0)
+    {
+      char buffer[kNumBytesToRead];
+      int num_bytes_read = arduinoSerial.Read(buffer, kNumBytesToRead);
+      //frc::SmartDashboard::PutString("My", "hee");
+      /*for(int i = 0; i < sizeof(buffer) / sizeof(buffer[0]); i++)
+      {
+        frc::SmartDashboard::PutString(std::to_string(i), buffer);
+      }*/
+      std::string str(reinterpret_cast<char*>(buffer), num_bytes_read);
+      frc::SmartDashboard::PutString("MyIntegerValue", str);
+    }
+    else
+    {
+      frc::SmartDashboard::PutString("Message", "no bytes recieved");
+    }
   }
 
 
