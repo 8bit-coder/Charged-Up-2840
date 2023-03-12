@@ -70,7 +70,7 @@ class Robot : public frc::TimedRobot {
   }
   void RobotPeriodic() override
   {
-    constexpr int kNumBytesToRead = 3; //num of digits + 2
+    constexpr int kNumBytesToRead = 64; //num of digits + 2
 
     currJoint1Pos = map(currJoint1Pos, 0, 2048, 0, 360);
     currJoint2Pos = map(currJoint2Pos, 0, 2047, 0, 359);
@@ -104,7 +104,20 @@ class Robot : public frc::TimedRobot {
       {
         frc::SmartDashboard::PutString(std::to_string(i), buffer);
       }*/
-      std::string str(reinterpret_cast<char*>(buffer), num_bytes_read);
+      //buffer[num_bytes_read] = '\0';
+      std::string str(buffer, num_bytes_read);
+      for (int i = 0; i < str.length(); i++) {
+        std::string digit_str(1, str[i]);
+        if (digit_str == "/n") 
+        {
+          frc::SmartDashboard::PutString("space" + std::to_string(i), digit_str);
+        } 
+        else 
+        {
+          frc::SmartDashboard::PutString("digit" + std::to_string(i), digit_str);
+        }
+      }
+
       frc::SmartDashboard::PutString("MyIntegerValue", str);
     }
     else
