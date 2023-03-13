@@ -90,16 +90,18 @@ class Robot : public frc::TimedRobot {
 
     if(c_ps5Controller.GetPOV() == 0 && lms_armTiltUpper->Get() == false){
       mg_armTiltMotors.Set(0.3);
-    }
-    if(c_ps5Controller.GetPOV() == 180 && lms_armTiltLower->Get() == false){
+    }else if(c_ps5Controller.GetPOV() == 180 && lms_armTiltLower->Get() == false){
       mg_armTiltMotors.Set(-0.3);
+    }else{
+      mg_armTiltMotors.Set(0);
     }
 
     if(c_ps5Controller.GetRawButton(4) && lms_grabberTiltUpper->Get() == false){
       m_grabberTiltMotor.Set(0.3);
-    }
-    if(c_ps5Controller.GetRawButton(2) && lms_grabberTiltLower->Get() == false){
+    }else if(c_ps5Controller.GetRawButton(2) && lms_grabberTiltLower->Get() == false){
       m_grabberTiltMotor.Set(-0.3);
+    }else{
+      m_grabberTiltMotor.Set(0);
     }
   }
   void TestInit() override {}
