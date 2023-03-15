@@ -11,6 +11,10 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <frc/Timer.h>
+#include <frc2/command/PIDSubsystem.h>
+#include <frc2/command/PIDCommand.h>
+
 
 //yike
 ctre::phoenix::motorcontrol::can::TalonFX joint1Motor(0);
@@ -31,6 +35,18 @@ double a2; //length of second arm segment
 double q1;
 double q2;
 
+double kp, ki, kd;
+double f, r, z;
+
+float setpoint = 0.0; // Desired acceleration
+float feedback = 0.0; // Actual acceleration
+float error = 0.0; // Error between setpoint and feedback
+float previousError = 0.0; // Error in previous iteration
+float integral = 0.0; // Integral of error over time
+float derivative = 0.0; // Derivative of error over time
+float output = 0.0; // Output of the PID system
+float outputPrev = 0.0;
+
 frc::PWMTalonSRX m_left{0};
 frc::PWMTalonSRX m_right{1};
 frc::PWMTalonSRX m_left2{2};
@@ -43,6 +59,12 @@ frc::SerialPort arduinoSerial {9600, frc::SerialPort::Port::kMXP, 8, frc::Serial
 
 frc::XboxController m_controller{0};
 frc::Timer m_timer;
+
+frc2::PIDController m_pidController{1.0, 0.0, 0.0, units::second_t{0.02}};
+static constexpr double kTolerance = 1.0;
+static constexpr double kSetpoint = 0.0;
+
+int gyroX = 0;
 
 class Robot : public frc::TimedRobot {
  public:
@@ -67,6 +89,20 @@ class Robot : public frc::TimedRobot {
 
     origin[0] = 0;
     origin[1] = 0;
+
+    z = 0.1;
+    f = 0.1;
+    r = 0; 
+
+    kp = z / (M_PI * f);
+    ki = 1 / ((2 * M_PI * f) * (2 * M_PI * f));
+    kd = r * z / (2 * M_PI * f);
+
+    m_pidController.SetTolerance(kTolerance); // Set the tolerance
+    m_pidController.SetPID(kp, ki, kd); // Set the PID constants
+    m_pidController.SetSetpoint(kSetpoint); // Set the setpoint
+    m_pidController.Reset(); // Reset the PID controller
+    m_pidController.EnableContinuousInput(-180.0, 180.0); // 
   }
   void RobotPeriodic() override
   {
@@ -95,37 +131,49 @@ class Robot : public frc::TimedRobot {
     joint1Motor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, targetEncoderValue1);
     joint2Motor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, targetEncoderValue2);
 
+
     if(arduinoSerial.GetBytesReceived() > 0)
     {
       char buffer[kNumBytesToRead];
       int num_bytes_read = arduinoSerial.Read(buffer, kNumBytesToRead);
-      //frc::SmartDashboard::PutString("My", "hee");
-      /*for(int i = 0; i < sizeof(buffer) / sizeof(buffer[0]); i++)
-      {
-        frc::SmartDashboard::PutString(std::to_string(i), buffer);
-      }*/
-      //buffer[num_bytes_read] = '\0';
       std::string str(buffer, num_bytes_read);
-      for (int i = 0; i < str.length(); i++) {
+      std::string add_value;
+      std::string value;
+      for (size_t i = 0, j = 0; i < str.length(); i++) {
         std::string digit_str(1, str[i]);
-        if (digit_str == "/n") 
-        {
-          frc::SmartDashboard::PutString("space" + std::to_string(i), digit_str);
-        } 
-        else 
-        {
-          frc::SmartDashboard::PutString("digit" + std::to_string(i), digit_str);
-        }
+          if(str[i] == '\n')
+          {
+            value = add_value;
+            add_value = ("");
+          }
+          else if(str[i] == '+' || str[i] == '-' || isdigit(str[i]))
+          {
+            add_value = (add_value + digit_str);
+          }
+          
       }
+      if(is_valid_integer_string(value))
+      {
+        frc::SmartDashboard::PutString(std::to_string(3), "STYS");
+      }
+      else
+      {
 
-      frc::SmartDashboard::PutString("MyIntegerValue", str);
+        frc::SmartDashboard::PutString(std::to_string(4), "no");
+      }
+      frc::SmartDashboard::PutString(std::to_string(1), value);
+      gyroX = std::stoi(value);
     }
     else
     {
       frc::SmartDashboard::PutString("Message", "no bytes recieved");
     }
-  }
+    double output = m_pidController.Calculate(gyroX);
+    frc::SmartDashboard::PutNumber("the number of all time1", gyroX);
+    frc::SmartDashboard::PutNumber("the number of all time2", output);
 
+    double motorPower = map(output, -180, 180, -1, 1);//set motor power go i hope haahs work ye
+  }
 
   void AutonomousInit() override {
   }
@@ -159,9 +207,64 @@ class Robot : public frc::TimedRobot {
   void TestPeriodic() override {}
 
   double map(double value, double start1, double stop1, double start2, double stop2)
- {
+  {
     return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
   }
+  double deltaTime() 
+  {
+    static auto lastTime = frc::Timer::GetFPGATimestamp();
+    auto currentTime = frc::Timer::GetFPGATimestamp();
+    auto deltaTime = (currentTime - lastTime).to<double>();
+    lastTime = currentTime;
+    if(deltaTime == 0)
+    {
+      deltaTime = 0.1;
+    }
+    return deltaTime;
+  }
+  bool is_valid_integer_string(const std::string& str)
+  {
+    for (char c : str)
+    {
+        if (!std::isdigit(c))
+        {
+            return false;
+        }
+    }
+    return true;
+  }
+  int string_to_int(const std::string& str)
+{
+    int result = 0;
+    int sign = 1;
+    int i = 0;
+
+    // Skip leading whitespace
+    while (str[i] != '+' || str[i] != '-' || !isdigit(str[i]))
+    {
+        i++;
+    }
+
+    // Check for optional sign
+    if (str[i] == '+' || str[i] == '-')
+    {
+        if (str[i] == '-')
+        {
+            sign = -1;
+        }
+        i++;
+    }
+
+    // Convert digits to integer
+    while (isdigit(str[i]))
+    {
+        result = result * 10 + (str[i] - '0');
+        i++;
+    }
+
+    return sign * result;
+}
+
 };
 
 
