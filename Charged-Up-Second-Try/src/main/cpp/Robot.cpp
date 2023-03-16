@@ -67,25 +67,25 @@ class Robot : public frc::TimedRobot {
   void AutonomousInit() override {}
 
   void AutonomousPeriodic() override {
-    dd_robotDrive.ArcadeDrive(0.2, 0);
+    dd_robotDrive.ArcadeDrive(0.4, 0);
   }
 
   void TeleopInit() override {}
 
   void TeleopPeriodic() override {
-    speed = c_ps5Controller.GetRawAxis(1);
+    speed = c_ps5Controller.GetRawAxis(5);
     turn = c_ps5Controller.GetRawAxis(0);
     dd_robotDrive.ArcadeDrive(speed, turn);
 
-    if(c_ps5Controller.GetRawButton(5) && lms_grabberInward->Get() == false){
+    if(c_ps5Controller.GetRawButton(5)){
       m_grabber.Set(0.5);
-    }else if(c_ps5Controller.GetRawButton(6) && lms_grabberOutward->Get() == false){
+    }else if(c_ps5Controller.GetRawButton(6)){
       m_grabber.Set(-0.5);
     }else{
       m_grabber.Set(0);
     }
-
-    if(c_ps5Controller.GetPOV() == 0 && lms_armTiltUpper->Get() == false){
+    
+    if(c_ps5Controller.GetPOV() == 0){
       mg_armTiltMotors.Set(0.3);
     }else if(c_ps5Controller.GetPOV() == 180 && lms_armTiltLower->Get() == false){
       mg_armTiltMotors.Set(-0.3);
@@ -94,9 +94,9 @@ class Robot : public frc::TimedRobot {
     }
 
     if(c_ps5Controller.GetRawButton(4)){
-      m_grabberTiltMotor.Set(0.3);
+      m_grabberTiltMotor.Set(0.8);
     }else if(c_ps5Controller.GetRawButton(2)){
-      m_grabberTiltMotor.Set(-0.3);
+      m_grabberTiltMotor.Set(-1);
     }else{
       m_grabberTiltMotor.Set(0);
     }
