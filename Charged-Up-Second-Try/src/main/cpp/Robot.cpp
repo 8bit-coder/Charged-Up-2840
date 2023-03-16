@@ -53,9 +53,6 @@ class Robot : public frc::TimedRobot {
   DigitalInput* lms_armTiltUpper = new DigitalInput(2);
   DigitalInput* lms_armTiltLower = new DigitalInput(3);
 
-  DigitalInput* lms_grabberTiltUpper = new DigitalInput(4);
-  DigitalInput* lms_grabberTiltLower = new DigitalInput(5);
-
   double speed = 0.0;
   double turn = 0.0;
 
@@ -81,9 +78,9 @@ class Robot : public frc::TimedRobot {
     dd_robotDrive.ArcadeDrive(speed, turn);
 
     if(c_ps5Controller.GetRawButton(5) && lms_grabberInward->Get() == false){
-      m_grabber.Set(0.1);
+      m_grabber.Set(0.5);
     }else if(c_ps5Controller.GetRawButton(6) && lms_grabberOutward->Get() == false){
-      m_grabber.Set(-0.1);
+      m_grabber.Set(-0.5);
     }else{
       m_grabber.Set(0);
     }
@@ -96,9 +93,9 @@ class Robot : public frc::TimedRobot {
       mg_armTiltMotors.Set(0);
     }
 
-    if(c_ps5Controller.GetRawButton(4) && lms_grabberTiltUpper->Get() == false){
+    if(c_ps5Controller.GetRawButton(4)){
       m_grabberTiltMotor.Set(0.3);
-    }else if(c_ps5Controller.GetRawButton(2) && lms_grabberTiltLower->Get() == false){
+    }else if(c_ps5Controller.GetRawButton(2)){
       m_grabberTiltMotor.Set(-0.3);
     }else{
       m_grabberTiltMotor.Set(0);
